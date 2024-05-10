@@ -3,6 +3,73 @@
 Get your latest news on AI and interract with an assitant to give you the
 information you need or searching for.
 
+## Setup
+
+### Create virtualenv
+
+Create your virtualenv with built-in `venv` package.
+
+```python
+python -m venv .venv
+```
+
+Activate your environment.
+
+```sh
+source .venv/bin/activate
+```
+
+### Install dependencies
+
+Install dependencies using `poetry`.
+
+```sh
+poetry install
+poetry install --with dev  # for dev
+```
+
+### API Keys and Secrets
+
+You have two options to create your API keys: using `.env` file or `streamlit`'s
+secrets. Note that you can only use `streamlit` when running the `streamlit` app
+locally or when deployed. However, `.env` is advised for local development.
+
+- **Create your secrets with `.env`**
+
+```sh
+mv .env.example .env
+```
+
+Edit `.env` file.
+
+```sh
+OPENAI_API_KEY=sk-...
+NEWS_API_KEY=9c...
+```
+
+- **Create your secrets & config with `streamlit`**
+
+```sh
+mkdir -p ./.streamlit/
+touch ./.streamlit/secrets.toml  # for secret keys
+touch ./.streamlit/config.toml   # for streamlit config
+```
+
+Edit `$CWD/.streamlit/secrets.toml` file.
+
+```toml
+OPENAI_API_KEY = "<get API key from platform.openai.com/api-keys>"
+NEWS_API_KEY = "<get API key from https://newsapi.org/register>"
+```
+
+## Usage
+
+Start your `streamlit` application:
+
+```sh
+streamlit run home.py
+```
+
 ## Contribution
 
 You are very welcome to modify and use them in your own projects.

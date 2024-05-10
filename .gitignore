@@ -66,3 +66,4 @@ dmypy.json
 .DS_Store
 
 # Project Specific
+.streamlit
