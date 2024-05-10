@@ -5,15 +5,40 @@ from datetime import datetime
 
 
 class Category(Enum):
-    GENERAL = 'general'
-    IT = 'it'
+    """Available categories."""
+
     BUSINESS = 'business'
-    TECHNOLOGY = 'technology'
+    ENTERTAINMENT = 'entertainment'
+    GENERAL = 'general'
+    HEALTH = 'health'
+    SCIENCE = 'science'
     SPORTS = 'sports'
+    TECHNOLOGY = 'technology'
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __eq__(self, other: Self | str) -> bool:
+        if isinstance(other, str):
+            return self.value == other
+        return self.value == other.value
+
+    def __ne__(self, other: Self | str) -> bool:
+        if isinstance(other, str):
+            return self.value != other
+        return self.value == other.value
 
     @classmethod
-    def from_str(cls, cat: str) -> Self:
-        raise NotImplementedError()
+    def from_str(cls, member: str) -> Self:
+        """Convert from a string to Category object."""
+        if (category := cls.__members__.get(member.upper())) is not None:
+            return category
+        raise ValueError(f'No member {member} in {cls}')
+
+    @classmethod
+    def to_str(cls, category: Self) -> str:
+        """Convert a category object to string."""
+        return str(category)
 
 
 @dataclass
@@ -22,10 +47,19 @@ class Source:
 
     id: str
     name: str
-    url: str
-    category: str = field(repr=False)
-    description: str = field(repr=False)
+    url: str | None = field(default=None, repr=False)
+    category: Category | None = field(default=None, repr=True)
+    description: str | None = field(default=None, repr=False)
     language: str = field(default='en', repr=False)
+
+    def __eq__(self, other: Self | str) -> bool:
+        if not isinstance(other, Source):
+            return NotImplemented
+
+        if isinstance(other, str):
+            return self.name == other
+
+        return self.name == other.name  # and self.id == other.id
 
     @classmethod
     def source_ids(cls, sources: list[Self] | None) -> str | None:
@@ -47,11 +81,12 @@ class Source:
 
 @dataclass
 class NewsArticle:
+    """News article details."""
     title: str
-    description: str = field(repr=False)
-    content: str
     author: str
-    published_at: datetime
-    source: Source
-    url: str
-    image_url: str
+    content: str = field(repr=False)
+    description: str = field(repr=False)
+    published_at: datetime = field(repr=False)
+    source: Source = field(repr=False)
+    url: str = field(repr=False)
+    image_url: str = field(repr=False)
