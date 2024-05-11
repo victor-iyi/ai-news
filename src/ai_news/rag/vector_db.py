@@ -71,11 +71,6 @@ def create_index(
         VectorStoreIndex: Created or loaded vector store index.
 
     """
-    # Check if collection exists.
-    collection_exists = False
-    if any(collection.name == collection_name for collection in client.list_collections()):
-        collection_exists = True
-
     # Create new collection if it doesn't exist.
     collection = client.get_or_create_collection(name=collection_name)
 
@@ -83,7 +78,7 @@ def create_index(
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
-    if not collection_exists and nodes is not None:
+    if nodes is not None:
         # Create from nodes
         index = VectorStoreIndex(
             nodes=nodes,
@@ -123,7 +118,7 @@ if __name__ == '__main__':
     if not collection_exists:
         articles = get_news()
         pprint(articles[:3])
-        print(f'{len(articles)}')
+        print(f'Num articles: {len(articles)}')
 
         splitter = SentenceSplitter()
         nodes = split_to_nodes(splitter, articles)

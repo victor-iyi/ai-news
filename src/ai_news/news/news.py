@@ -1,5 +1,7 @@
 import os
+import concurrent.futures
 from datetime import datetime
+from typing import Any
 
 from newsapi import NewsApiClient
 from dotenv import load_dotenv
@@ -81,7 +83,7 @@ class News:
             list[NewsArticle]: List of all news articles that meets the param criteria.
 
         """
-        result = self._client.get_everything(
+        response = self._client.get_everything(
             q=q,
             qintitle=qintitle,
             sources=Source.source_ids(sources=sources),
@@ -98,25 +100,13 @@ class News:
             page_size=page_size,
         )
 
-        articles: list[NewsArticle] = []
-        for article in result['articles']:
-            source = Source(
-                id=article['source']['id'],
-                name=article['source']['name'],
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            article_futures = executor.map(
+                News._create_news_articles,
+                response['articles'],
             )
 
-            news_article = NewsArticle(
-                title=article['title'],
-                author=article['author'],
-                content=article['content'],
-                description=article['description'],
-                published_at=datetime.fromisoformat(article['publishedAt']),
-                source=source,
-                url=article['url'],
-                image_url=article['urlToImage'],
-            )
-            articles.append(news_article)
-
+        articles: list[NewsArticle] = list(article_futures)
         return articles
 
     def get_top_headlines(
@@ -156,7 +146,7 @@ class News:
                 'cannot mix country/category param with sources param.'
             )
 
-        result = self._client.get_top_headlines(
+        response = self._client.get_top_headlines(
             q=q,
             qintitle=qintitle,
             sources=Source.source_ids(sources=sources),
@@ -165,30 +155,37 @@ class News:
             country=country,
         )  # {status: ok, totalResult: 0, articles: []}
 
-        if result['status'] != 'ok':
+        if response['status'] != 'ok':
             raise Exception('Something went wrong')
 
-        articles: list[NewsArticle] = []
-        for article in result['articles']:
-            # TODO: Use existing source object with matching name.
-            source = Source(
-                id=article['source']['id'],
-                name=article['source']['name'],
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            article_futures = executor.map(
+                News._create_news_articles,
+                response['articles'],
             )
-
-            news_article = NewsArticle(
-                title=article['title'],
-                author=article['author'],
-                content=article['content'],
-                description=article['description'],
-                published_at=datetime.fromisoformat(article['publishedAt']),
-                source=source,
-                url=article['url'],
-                image_url=article['urlToImage'],
-            )
-            articles.append(news_article)
+        articles: list[NewsArticle] = list(article_futures)
 
         return articles
+
+    @staticmethod
+    def _create_news_articles(article: dict[str, Any]) -> NewsArticle:
+        # TODO: Use existing source object with matching name.
+        source = Source(
+            id=article['source']['id'],
+            name=article['source']['name'],
+        )
+
+        news_article = NewsArticle(
+            title=article['title'],
+            author=article['author'],
+            content=article['content'],
+            description=article['description'],
+            published_at=datetime.fromisoformat(article['publishedAt']),
+            source=source,
+            url=article['url'],
+            image_url=article['urlToImage'],
+        )
+        return news_article
 
     def get_sources(
         self,
