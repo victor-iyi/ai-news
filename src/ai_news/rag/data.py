@@ -44,7 +44,7 @@ def get_news(
         language=language,
     )
 
-    # Get 100 articles.
+    # TODO: Get more than 100 articles.
     articles = news.get_articles(
         q=topic,
         sources=sources,

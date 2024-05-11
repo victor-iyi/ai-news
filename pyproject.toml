@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ai-news"
-version = "0.1.0"
+version = "0.1.1"
 description = "Latest AI news with chat assistant"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 maintainers = [

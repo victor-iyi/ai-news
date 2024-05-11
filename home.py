@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 from ai_news.st_util import add_to_message_history
+from ai_news.rag.index import create_index
 
 load_dotenv()
 
@@ -39,6 +40,22 @@ if 'messages' not in st.session_state:
 for msg in st.session_state.messages:
     st.chat_message(msg['role']).write(msg['content'])
 
+# TODO: Wrap this in a progress bar or spinner widget.
+if 'chat_engine' not in st.session_state.keys():
+    index = create_index(
+        topic='artificial intelligence',
+        collection_name='artificial_intelligence'
+    )
+    chat_engine = index.as_chat_engine()
+    st.session_state.chat_engine = chat_engine
+
+
 if prompt := st.chat_input(st.session_state.messages[0]['content']):
     st.chat_message('user').write(prompt)
     add_to_message_history('user', prompt)
+    with st.chat_message('assistant'):
+        with st.spinner('Thinking...'):
+            response = st.session_state.chat_engine.chat(prompt)
+            st.write(response.response)
+            # st.write(response.sources)
+            add_to_message_history('assistant', response.response)

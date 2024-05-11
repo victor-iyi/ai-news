@@ -51,7 +51,7 @@ def get_client(
     return db
 
 
-def create_index(
+def create_vector_store_index(
     client: ClientAPI,
     collection_name: str,
     nodes: list[TextNode] | None = None,
@@ -95,40 +95,3 @@ def create_index(
         )
 
     return index
-
-
-if __name__ == '__main__':
-    from pprint import pprint
-    from ai_news.rag.data import get_news, split_to_nodes
-    from llama_index.core.node_parser import SentenceSplitter
-    from llama_index.embeddings.openai import OpenAIEmbedding
-
-    client = get_client(
-        client_type=ClientType.LOCAL,
-        path='res/vector_store',
-    )
-
-    collection_name = 'artificial_intelligence'
-
-    # Check if collection exists.
-    collection_exists = False
-    if any(collection.name == collection_name for collection in client.list_collections()):
-        collection_exists = True
-
-    if not collection_exists:
-        articles = get_news()
-        pprint(articles[:3])
-        print(f'Num articles: {len(articles)}')
-
-        splitter = SentenceSplitter()
-        nodes = split_to_nodes(splitter, articles)
-    else:
-        nodes = None
-
-    index = create_index(
-        client=client,
-        collection_name=collection_name,
-        nodes=nodes,
-        embed_model=OpenAIEmbedding(),
-    )
-    print(index)

@@ -175,6 +175,9 @@ class News:
             name=article['source']['name'],
         )
 
+        # TODO: article['content'] doesn't contain the full content
+        # Might wanna use BeautifulSoup to parse the article['url'] instead.
+
         news_article = NewsArticle(
             title=article['title'],
             author=article['author'],
