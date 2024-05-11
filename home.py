@@ -1,8 +1,11 @@
 import os
+from llama_index.core.prompts import ChatMessage, MessageRole
 import streamlit as st
 from dotenv import load_dotenv
-from ai_news.st_util import add_to_message_history
-from ai_news.rag.index import create_index
+from ai_news.st_util import (
+    add_to_message_history,
+    create_chat_engine,
+)
 
 load_dotenv()
 
@@ -15,47 +18,36 @@ if (NEWS_API_KEY := os.getenv('NEWS_API_KEY')) is None:
         st.error(f'Could not load NEWS_API_KEY. {e}')
         st.stop()
 
-# Containers.
-header = st.container()
-# latest_news = st.container()
-# chat_section = st.container()
-
-with header:
-    st.title('AI News')
-    st.caption('''\
-    Get your latest AI news from multiple sources and interract to get more insight you care about.
-    ''')
-
-st.header('Get the latest news')
+st.title('🤖 AI News 📰')
+st.caption('''\
+Get your latest AI news from multiple sources and interract to get more insight you care about.
+''')
 
 # Create messages state.
 if 'messages' not in st.session_state:
     st.session_state.messages = [
-        {
-            'role': 'assistant',
-            'content': 'What are you intrested in today?',
-        },
+        ChatMessage(
+            role=MessageRole.ASSISTANT,
+            content='What are you intrested in today?',
+        )
     ]
 
+# Dump message history.
 for msg in st.session_state.messages:
-    st.chat_message(msg['role']).write(msg['content'])
+    st.chat_message(msg.role.value).write(msg.content)
 
-# TODO: Wrap this in a progress bar or spinner widget.
-if 'chat_engine' not in st.session_state.keys():
-    index = create_index(
-        topic='artificial intelligence',
-        collection_name='artificial_intelligence'
-    )
-    chat_engine = index.as_chat_engine()
-    st.session_state.chat_engine = chat_engine
+# Create chat engine.
+chat_engine = create_chat_engine()
 
-
-if prompt := st.chat_input(st.session_state.messages[0]['content']):
+if prompt := st.chat_input('What can I help you with?'):
     st.chat_message('user').write(prompt)
-    add_to_message_history('user', prompt)
-    with st.chat_message('assistant'):
+    add_to_message_history(MessageRole.USER, prompt)
+    with st.chat_message(MessageRole.ASSISTANT.value):
         with st.spinner('Thinking...'):
-            response = st.session_state.chat_engine.chat(prompt)
+            response = chat_engine.chat(
+                message=prompt,
+                chat_history=st.session_state.messages,
+            )
             st.write(response.response)
             # st.write(response.sources)
-            add_to_message_history('assistant', response.response)
+            add_to_message_history(MessageRole.ASSISTANT, response.response)
