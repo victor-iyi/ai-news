@@ -135,6 +135,12 @@ class News:
                 Defaults to None.
             sources (list[Sources], optional): List of news source objects.
                 Defaults to None.
+            category (str, optional): News category, e.g. business, it, technology.
+                Default is None.
+            country (str, optional): Two letter country code. E.g us, au, ...
+                Default is None.
+            language (str, optional): News language.
+                Default is 'en'.
 
         Raises:
             ValueError: cannot mix country/category with sources param.

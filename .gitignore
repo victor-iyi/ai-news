@@ -67,3 +67,4 @@ dmypy.json
 
 # Project Specific
 .streamlit
+res/
