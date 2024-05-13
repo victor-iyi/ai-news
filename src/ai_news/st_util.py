@@ -20,7 +20,9 @@ def add_to_message_history(role: MessageRole, content: str) -> None:
 def create_chat_engine() -> BaseChatEngine:
     """Create chat engine from index."""
     index = create_index(
-        topic='artificial intelligence', collection_name='artificial_intelligence'
+        topic='artificial intelligence',
+        collection_name='artificial_intelligence',
+        use_semantic_splitter=True,
     )
     chat_engine: BaseChatEngine = index.as_chat_engine()
     return chat_engine

@@ -1,26 +1,18 @@
-import concurrent.futures
-
 from dotenv import load_dotenv
-from llama_index.core.base.embeddings.base import BaseEmbedding
-from llama_index.core.node_parser import (
-    SentenceSplitter,
-)
-
-from llama_index.core.schema import MetadataMode, TextNode
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core import Document
 
 from ai_news.news import News
-from ai_news.news.util import Category, NewsArticle
+from ai_news.news.util import Category
 
 load_dotenv()
 
 
-def get_news(
+def get_news_documents(
     topic: str = 'artificial intelligence',
     category: Category | None = None,
     country: str | None = None,
     language: str = 'en',
-) -> list[NewsArticle]:
+) -> list[Document]:
     """Get list of news articles.
 
     Args:
@@ -34,7 +26,7 @@ def get_news(
             Default is 'en'.
 
     Returns:
-        list[NewsArticle]: List of articles based on given params.
+        list[Document]: Parsed articles based on given params.
 
     """
     news = News()
@@ -47,96 +39,40 @@ def get_news(
     )
 
     # TODO: Get more than 100 articles.
-    articles: list[NewsArticle] = news.get_articles(
+    documents: list[Document] = news.get_documents(
         q=topic,
         sources=sources,
     )
-    return articles
-
-
-def split_to_nodes(
-    splitter: SentenceSplitter,
-    articles: list[NewsArticle],
-    embed_model: BaseEmbedding | None = None,
-) -> list[TextNode]:
-    """Split news articles to `list[TextNode]` from `SentenceSplitter`.
-
-    Args:
-        splitter (SentenceSplitter): Splitter to use.
-        articles (list[NewsArticle]): List of news articles.
-        embed_model (BaseEmbedding, optional): Embedding object to use.
-            Defaults to None.
-
-    Returns:
-        list[TextNode]: Text nodes.
-
-    """
-
-    nodes: list[TextNode] = []
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        nodes_future = map(
-            lambda article: executor.submit(
-                _create_nodes,
-                article,
-                splitter=splitter,
-                embed_model=embed_model,
-            ),
-            articles,
-        )
-
-        for future in concurrent.futures.as_completed(nodes_future):
-            try:
-                nodes.extend(future.result())
-            except Exception as e:
-                print(f'{e}')
-
-    return nodes
-
-
-def _create_nodes(
-    article: NewsArticle,
-    splitter: SentenceSplitter,
-    embed_model: BaseEmbedding | None = None,
-) -> list[TextNode]:
-    """Create `TextNode`s for a news article."""
-
-    # Note: We return list[TextNode] because an article can be split
-    # into multiple chunks.
-    nodes: list[TextNode] = []
-    for chunk in splitter.split_text(article.content):
-        # Create node from article.
-        node = TextNode(
-            text=chunk,
-            extra_info={
-                'title': article.title,
-                'author': article.author,
-                'source': article.source.name,
-                'description': article.description,
-                'url': article.url,
-                'published_at': article.published_at.strftime('%Y-%m-%dT%H:%M:%S'),
-                'image_url': article.image_url,
-            },
-        )
-
-        # Embed node content.
-        if embed_model is not None:
-            embed_text = node.get_content(metadata_mode=MetadataMode.ALL)
-            node_embedding = embed_model.get_text_embedding(text=embed_text)
-            node.embedding = node_embedding
-        nodes.append(node)
-
-    return nodes
+    return documents
 
 
 if __name__ == '__main__':
     from pprint import pprint
 
-    articles = get_news()
-    pprint(articles[:3])
-    print(f'{len(articles)}')
+    from llama_index.core.node_parser import (
+        NodeParser,
+        SemanticSplitterNodeParser,
+        SentenceSplitter,
+    )
+    from llama_index.core.schema import MetadataMode
 
-    splitter = SentenceSplitter()
-    embed_model = OpenAIEmbedding()
-    nodes = split_to_nodes(splitter, articles, embed_model)
-    print(f'Nodes = {len(nodes), }')
+    # Get the news articles.
+    documents = get_news_documents()
+    pprint(documents[0])
+    print(f'{len(documents):,=}')
+
+    # Get node splitter to use.
+    USE_SEMANTIC = False
+    splitter: NodeParser = (
+        SemanticSplitterNodeParser.from_defaults()
+        if USE_SEMANTIC
+        else SentenceSplitter()
+    )
+
+    # Split documents into nodes.
+    nodes = splitter.get_nodes_from_documents(
+        documents=documents,
+        show_progress=True,
+    )
+    print(f'\nNodes = {len(nodes):,=}')
     print(nodes[0].get_content(MetadataMode.ALL))

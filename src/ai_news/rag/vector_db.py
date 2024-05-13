@@ -5,7 +5,7 @@ from chromadb import EphemeralClient, HttpClient, PersistentClient
 from chromadb.api import ClientAPI
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.embeddings.utils import EmbedType
-from llama_index.core.schema import TextNode
+from llama_index.core.schema import BaseNode
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
 
@@ -53,7 +53,7 @@ def get_client(
 def create_vector_store_index(
     client: ClientAPI,
     collection_name: str,
-    nodes: list[TextNode] | None = None,
+    nodes: list[BaseNode] | None = None,
     embed_model: EmbedType | None = None,
 ) -> VectorStoreIndex:
     """Create or load VectorStoreIndex from Chroma.
@@ -61,7 +61,7 @@ def create_vector_store_index(
     Args:
         client (ClientAPI): Chroma client.
         collection_name (str): Name of chroma collection.
-        nodes (list[TextNode], optional): List of text node.
+        nodes (list[BaseNode], optional): List of nodes.
             Defaults to None.
         embed_model (EmbedType, optional): `BaseEmbedding` or embedding str to use.
             Defaults to None.
@@ -79,6 +79,7 @@ def create_vector_store_index(
 
     if nodes is not None:
         # Create from nodes
+        print('Creating index...')
         index = VectorStoreIndex(
             nodes=nodes,
             embed_model=embed_model,
@@ -87,6 +88,7 @@ def create_vector_store_index(
         )
     else:
         # Load from vector store.
+        print('Loading index...')
         index = VectorStoreIndex.from_vector_store(
             vector_store=vector_store,
             embed_model=embed_model,

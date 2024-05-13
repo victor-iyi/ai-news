@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ai-news"
-version = "0.1.2"
+version = "0.2.0"
 description = "Latest AI news with chat assistant"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 maintainers = [
@@ -41,6 +41,7 @@ llama-index-embeddings-openai = "^0.1.9"
 llama-index-llms-openai = "^0.1.18"
 llama-index-vector-stores-chroma = "^0.1.8"
 chromadb = "^0.5.0"
+trafilatura = "^1.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -105,6 +106,11 @@ add_ignore = [
   "D415",
 ]
 
+[tool.pyright]
+reportOptionalCall = "none"
+reportGeneralTypeIssues = "none"
+reportOptionalMemberAccess = "none"
+reportUnboundVariable = "none"
 
 [tool.ruff.format]
 quote-style = "single"
