@@ -1,6 +1,6 @@
+import streamlit as st
 from llama_index.core.chat_engine.types import BaseChatEngine
 from llama_index.core.prompts import ChatMessage, MessageRole
-import streamlit as st
 
 from ai_news.rag.index import create_index
 
@@ -20,8 +20,7 @@ def add_to_message_history(role: MessageRole, content: str) -> None:
 def create_chat_engine() -> BaseChatEngine:
     """Create chat engine from index."""
     index = create_index(
-        topic='artificial intelligence',
-        collection_name='artificial_intelligence'
+        topic='artificial intelligence', collection_name='artificial_intelligence'
     )
-    chat_engine = index.as_chat_engine()
+    chat_engine: BaseChatEngine = index.as_chat_engine()
     return chat_engine

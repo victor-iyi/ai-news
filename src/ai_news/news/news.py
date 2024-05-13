@@ -1,10 +1,10 @@
-import os
 import concurrent.futures
+import os
 from datetime import datetime
 from typing import Any
 
-from newsapi import NewsApiClient
 from dotenv import load_dotenv
+from newsapi import NewsApiClient
 
 from ai_news.news.util import (
     Category,
@@ -35,7 +35,7 @@ class News:
         language: str = 'en',
         sort_by: str | None = None,
         page: int | None = None,
-        page_size:  int | None = None,
+        page_size: int | None = None,
     ) -> list[NewsArticle]:
         """Get all news articles.
 
@@ -88,12 +88,13 @@ class News:
             qintitle=qintitle,
             sources=Source.source_ids(sources=sources),
             domains=','.join(domains) if domains else None,
-            exclude_domains=(','.join(exclude_domains)
-                             if exclude_domains else None),
-            from_param=(from_date.strftime('%Y-%m-%dT%H:%M:%S')
-                        if from_date is not None else None),
-            to=(to_date.strftime('%Y-%m-%dT%H:%M:%S')
-                if to_date is not None else None),
+            exclude_domains=(','.join(exclude_domains) if exclude_domains else None),
+            from_param=(
+                from_date.strftime('%Y-%m-%dT%H:%M:%S')
+                if from_date is not None
+                else None
+            ),
+            to=(to_date.strftime('%Y-%m-%dT%H:%M:%S') if to_date is not None else None),
             language=language,
             sort_by=sort_by,  # TODO: Make into Enum
             page=page,
@@ -142,9 +143,7 @@ class News:
 
         # Sources.
         if (sources is not None) and ((country is not None) or (category is not None)):
-            raise ValueError(
-                'cannot mix country/category param with sources param.'
-            )
+            raise ValueError('cannot mix country/category param with sources param.')
 
         response = self._client.get_top_headlines(
             q=q,

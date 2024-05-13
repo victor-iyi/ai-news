@@ -1,11 +1,9 @@
-from typing import Any
 from enum import Enum, auto
+from typing import Any
 
+from chromadb import EphemeralClient, HttpClient, PersistentClient
 from chromadb.api import ClientAPI
-from chromadb import EphemeralClient, PersistentClient, HttpClient
-
 from llama_index.core import StorageContext, VectorStoreIndex
-# from llama_index.core.base.embeddings.base import BaseEmbedding
 from llama_index.core.embeddings.utils import EmbedType
 from llama_index.core.schema import TextNode
 from llama_index.vector_stores.chroma import ChromaVectorStore
@@ -13,6 +11,7 @@ from llama_index.vector_stores.chroma import ChromaVectorStore
 
 class ClientType(Enum):
     """Chroma DB client type."""
+
     LOCAL = auto()
     IN_MEMORY = auto()
     HTTP_CLIENT = auto()

@@ -1,14 +1,16 @@
 import concurrent.futures
+
+from dotenv import load_dotenv
 from llama_index.core.base.embeddings.base import BaseEmbedding
-from llama_index.core.schema import MetadataMode, TextNode
 from llama_index.core.node_parser import (
     SentenceSplitter,
-    # SemanticSplitterNodeParser
 )
+
+from llama_index.core.schema import MetadataMode, TextNode
 from llama_index.embeddings.openai import OpenAIEmbedding
+
 from ai_news.news import News
 from ai_news.news.util import Category, NewsArticle
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -45,7 +47,7 @@ def get_news(
     )
 
     # TODO: Get more than 100 articles.
-    articles = news.get_articles(
+    articles: list[NewsArticle] = news.get_articles(
         q=topic,
         sources=sources,
     )
@@ -79,12 +81,12 @@ def split_to_nodes(
                 splitter=splitter,
                 embed_model=embed_model,
             ),
-            articles
+            articles,
         )
 
         for future in concurrent.futures.as_completed(nodes_future):
             try:
-                nodes.extend(future.result())  # type: list[TextNode]
+                nodes.extend(future.result())
             except Exception as e:
                 print(f'{e}')
 
@@ -119,9 +121,7 @@ def _create_nodes(
         # Embed node content.
         if embed_model is not None:
             embed_text = node.get_content(metadata_mode=MetadataMode.ALL)
-            node_embedding = embed_model.get_text_embedding(
-                text=embed_text
-            )
+            node_embedding = embed_model.get_text_embedding(text=embed_text)
             node.embedding = node_embedding
         nodes.append(node)
 
@@ -130,6 +130,7 @@ def _create_nodes(
 
 if __name__ == '__main__':
     from pprint import pprint
+
     articles = get_news()
     pprint(articles[:3])
     print(f'{len(articles)}')
@@ -137,5 +138,5 @@ if __name__ == '__main__':
     splitter = SentenceSplitter()
     embed_model = OpenAIEmbedding()
     nodes = split_to_nodes(splitter, articles, embed_model)
-    print(f'Nodes = {len(nodes),}')
+    print(f'Nodes = {len(nodes), }')
     print(nodes[0].get_content(MetadataMode.ALL))

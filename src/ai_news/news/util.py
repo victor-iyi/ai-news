@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
 from typing import Self
-from datetime import datetime
 
 
 class Category(Enum):
@@ -18,15 +18,19 @@ class Category(Enum):
     def __str__(self) -> str:
         return self.value
 
-    def __eq__(self, other: Self | str) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Category):
+            return self.value == other.value
         if isinstance(other, str):
             return self.value == other
-        return self.value == other.value
+        raise NotImplementedError('Invalid comparison.')
 
-    def __ne__(self, other: Self | str) -> bool:
+    def __ne__(self, other: object) -> bool:
+        if isinstance(other, Category):
+            return self.value != other.value
         if isinstance(other, str):
             return self.value != other
-        return self.value == other.value
+        raise NotImplementedError('Invalid comparison.')
 
     @classmethod
     def from_str(cls, member: str) -> Self:
@@ -52,14 +56,14 @@ class Source:
     description: str | None = field(default=None, repr=False)
     language: str = field(default='en', repr=False)
 
-    def __eq__(self, other: Self | str) -> bool:
-        if not isinstance(other, Source):
-            return NotImplemented
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Source):
+            return self.name == other.name  # and self.id == other.id
 
         if isinstance(other, str):
             return self.name == other
 
-        return self.name == other.name  # and self.id == other.id
+        raise NotImplementedError('Invalid comparison.')
 
     @classmethod
     def source_ids(cls, sources: list[Self] | None) -> str | None:
@@ -82,6 +86,7 @@ class Source:
 @dataclass
 class NewsArticle:
     """News article details."""
+
     title: str
     author: str
     content: str = field(repr=False)
