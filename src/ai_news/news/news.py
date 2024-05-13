@@ -24,9 +24,17 @@ class NewsException(Exception):
 class News:
     """Get news articles, headlines and sources from the News API."""
 
-    def __init__(self) -> None:
+    def __init__(self, api_key: str | None = None) -> None:
+        """Create News API client.
+
+        Args:
+            api_key (str, optional): News API key.
+                Defaults to None. Loaded from environment variables.
+
+        """
+        api_key = api_key or os.environ['NEWS_API_KEY']
         self._client = NewsApiClient(
-            api_key=os.environ['NEWS_API_KEY'],
+            api_key=api_key,
         )
 
     def get_documents(

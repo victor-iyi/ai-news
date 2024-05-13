@@ -12,6 +12,7 @@ def get_news_documents(
     category: Category | None = None,
     country: str | None = None,
     language: str = 'en',
+    news_api_key: str | None = None,
 ) -> list[Document]:
     """Get list of news articles.
 
@@ -24,12 +25,14 @@ def get_news_documents(
             Default is None.
         language (str, optional): News language.
             Default is 'en'.
+        news_api_key (str, optional): News API key.
+            Defaults to None.
 
     Returns:
         list[Document]: Parsed articles based on given params.
 
     """
-    news = News()
+    news = News(api_key=news_api_key)
 
     # Sources.
     sources = news.get_sources(

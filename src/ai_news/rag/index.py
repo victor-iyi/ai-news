@@ -18,6 +18,7 @@ def create_index(
     topic: str = 'artificial intelligence',
     collection_name: str = 'artificial_intelligence',
     use_semantic_splitter: bool = False,
+    news_api_key: str | None = None,
 ) -> VectorStoreIndex:
     """Create index.
 
@@ -28,6 +29,8 @@ def create_index(
             Defaults to 'artificial_intelligence'.
         use_semantic_splitter (bool, optional): Whether to use semnatic node splitter.
             Defaults to False.
+        news_api_key: News API key.
+            Defaults to None.
 
     Returns:
         VectorStoreIndex: Loaded/created vector index.
@@ -49,7 +52,10 @@ def create_index(
         # TODO: Get more than 100 news articles.
         # Get news articles.
         print(f'Get news article for {topic}...')
-        documents = get_news_documents(topic=topic)
+        documents = get_news_documents(
+            topic=topic,
+            news_api_key=news_api_key,
+        )
 
         # Split documents into nodes.
         print(f'Splitting {len(documents):,} documents into nodes...\n')

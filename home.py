@@ -1,22 +1,25 @@
 import os
+from llama_index.core import Settings
 from llama_index.core.prompts import ChatMessage, MessageRole
 import streamlit as st
 from dotenv import load_dotenv
 from ai_news.st_util import (
     add_to_message_history,
     create_chat_engine,
+    load_embed_model,
+    load_model,
 )
 
 load_dotenv()
 
-# Load from .env or streamlit secrets.
-if (NEWS_API_KEY := os.getenv('NEWS_API_KEY')) is None:
-    try:
-        # TODO: Add secrets on deploy.
-        NEWS_API_KEY = st.secrets.get('NEWS_API_KEY')
-    except FileNotFoundError as e:
-        st.error(f'Could not load NEWS_API_KEY. {e}')
-        st.stop()
+# Load from streamlit secrets or .env.
+NEWS_API_KEY = st.secrets.get('NEWS_API_KEY', os.environ['NEWS_API_KEY'])
+OPENAI_API_KEY = st.secrets.get('OPENAI_API_KEY', os.environ['OPENAI_API_KEY'])
+
+if not all((NEWS_API_KEY, OPENAI_API_KEY)):
+    st.error('Could not fetch API keys')
+    st.stop()
+
 
 st.title('🤖 AI News 📰')
 st.caption("""\
@@ -36,8 +39,12 @@ if 'messages' not in st.session_state:
 for msg in st.session_state.messages:
     st.chat_message(msg.role.value).write(msg.content)
 
+# Load LLM & embedding models.
+Settings.llm = load_model(api_key=OPENAI_API_KEY)
+Settings.embed_model = load_embed_model(api_key=OPENAI_API_KEY)
+
 # Create chat engine.
-chat_engine = create_chat_engine()
+chat_engine = create_chat_engine(news_api_key=NEWS_API_KEY)
 
 if prompt := st.chat_input('What can I help you with?'):
     st.chat_message('user').write(prompt)
