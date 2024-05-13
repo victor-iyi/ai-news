@@ -18,9 +18,7 @@ def main() -> None:
         language=language,
     )
     pprint(sources)
-    print(
-        f'There are {len(sources)} sources given {category=}, {country=}, {language=}'
-    )
+    print(f'There are {len(sources)} sources given {category=}, {country=}, {language=}')
 
     print(f'\n{"--" * 50}\n')
 

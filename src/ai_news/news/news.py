@@ -322,11 +322,7 @@ class News:
             sources=Source.source_ids(sources=sources),
             domains=','.join(domains) if domains else None,
             exclude_domains=(','.join(exclude_domains) if exclude_domains else None),
-            from_param=(
-                from_date.strftime('%Y-%m-%dT%H:%M:%S')
-                if from_date is not None
-                else None
-            ),
+            from_param=(from_date.strftime('%Y-%m-%dT%H:%M:%S') if from_date is not None else None),
             to=(to_date.strftime('%Y-%m-%dT%H:%M:%S') if to_date is not None else None),
             language=language,
             sort_by=sort_by,  # TODO: Make into Enum
@@ -412,7 +408,7 @@ class News:
 
         document = Document(
             text=content,
-            metadata={  # type: ignore[call-arg]
+            metadata={
                 'title': article['title'],
                 'author': article['author'],
                 'source': source.name,
@@ -431,15 +427,13 @@ class News:
             documents = executor.map(
                 lambda article: Document(
                     text=article.content,
-                    metadata={  # type: ignore[call-arg]
+                    metadata={
                         'title': article.title,
                         'author': article.author,
                         'source': article.source.name,
                         'description': article.description,
                         'url': article.url,
-                        'published_at': article.published_at.strftime(
-                            '%Y-%m-%dT%H:%M:%S'
-                        ),
+                        'published_at': article.published_at.strftime('%Y-%m-%dT%H:%M:%S'),
                         'image_url': article.image_url,
                     },
                 ),

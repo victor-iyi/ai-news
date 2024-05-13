@@ -42,9 +42,7 @@ def create_index(
 
     # Check if collection exists.
     collection_exists = False
-    if any(
-        collection.name == collection_name for collection in client.list_collections()
-    ):
+    if any(collection.name == collection_name for collection in client.list_collections()):
         collection_exists = True
 
     if not collection_exists:

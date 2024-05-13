@@ -63,11 +63,7 @@ if __name__ == '__main__':
 
     # Get node splitter to use.
     USE_SEMANTIC = False
-    splitter: NodeParser = (
-        SemanticSplitterNodeParser.from_defaults()
-        if USE_SEMANTIC
-        else SentenceSplitter()
-    )
+    splitter: NodeParser = SemanticSplitterNodeParser.from_defaults() if USE_SEMANTIC else SentenceSplitter()
 
     # Split documents into nodes.
     nodes = splitter.get_nodes_from_documents(

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ai-news"
-version = "0.2.0"
+version = "0.2.1"
 description = "Latest AI news with chat assistant"
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
 maintainers = [
@@ -46,10 +46,11 @@ trafilatura = "^1.9.0"
 
 [tool.poetry.group.dev.dependencies]
 docformatter = {version = "^1.7.5", extras = ["tomli"]}
-pydocstyle = {version = "^6.3.0", extras = ["tomli"]}
+pydocstyle = {version = "^6.3.0", extras = ["toml"]}
 mypy = "^1.10.0"
 pre-commit = "^3.7.0"
 flake8 = "^7.0.0"
+ruff = "^0.4.4"
 
 [build-system]
 requires = ["poetry-core"]
@@ -111,6 +112,18 @@ reportOptionalCall = "none"
 reportGeneralTypeIssues = "none"
 reportOptionalMemberAccess = "none"
 reportUnboundVariable = "none"
+
+[tool.ruff]
+line-length = 120
+
+
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # pyupgrade
+  "UP",
+]
 
 [tool.ruff.format]
 quote-style = "single"

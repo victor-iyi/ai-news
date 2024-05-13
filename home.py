@@ -19,9 +19,9 @@ if (NEWS_API_KEY := os.getenv('NEWS_API_KEY')) is None:
         st.stop()
 
 st.title('🤖 AI News 📰')
-st.caption('''\
+st.caption("""\
 Get your latest AI news from multiple sources and interract to get more insight you care about.
-''')
+""")
 
 # Create messages state.
 if 'messages' not in st.session_state:
