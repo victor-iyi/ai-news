@@ -1,8 +1,8 @@
 import streamlit as st
-from llama_index.llms.openai import OpenAI
-from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.chat_engine.types import BaseChatEngine
 from llama_index.core.prompts import ChatMessage, MessageRole
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI
 
 from ai_news.rag.index import create_index
 
@@ -35,6 +35,7 @@ def create_chat_engine(news_api_key: str) -> BaseChatEngine:
 
 @st.cache_data
 def load_embed_model(api_key: str) -> OpenAIEmbedding:
+    """Load OpenAI embedding model."""
     return OpenAIEmbedding(
         api_key=api_key,
     )
@@ -42,6 +43,7 @@ def load_embed_model(api_key: str) -> OpenAIEmbedding:
 
 @st.cache_data
 def load_model(api_key: str) -> OpenAI:
+    """Load OpenAI model."""
     return OpenAI(
         api_key=api_key,
     )

@@ -50,29 +50,29 @@ repos:
     hooks:
       - id: poetry-check
       # - id: poetry-lock
-      # Export main dependencies.
-      - id: poetry-export
-        args:
-          [
-            -f,
-            requirements.txt,
-            -o,
-            requirements.txt,
-            --only,
-            main,
-            --without-hashes,
-            --without-urls,
-          ]
-      # Export dev dependencies.
-      - id: poetry-export
-        args:
-          [
-            "-f",
-            "requirements.txt",
-            "-o",
-            "requirements-dev.txt",
-            "--with",
-            "dev,test",
-            "--without-hashes",
-            "--without-urls",
-          ]
+      # # Export main dependencies.
+      # - id: poetry-export
+      #   args:
+      #     [
+      #       -f,
+      #       requirements.txt,
+      #       -o,
+      #       requirements.txt,
+      #       --only,
+      #       main,
+      #       --without-hashes,
+      #       --without-urls,
+      #     ]
+      # # Export dev dependencies.
+      # - id: poetry-export
+      #   args:
+      #     [
+      #       "-f",
+      #       "requirements.txt",
+      #       "-o",
+      #       "requirements-dev.txt",
+      #       "--with",
+      #       "dev,test",
+      #       "--without-hashes",
+      #       "--without-urls",
+      #     ]
