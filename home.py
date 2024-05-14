@@ -50,11 +50,16 @@ if prompt := st.chat_input('What can I help you with?'):
     st.chat_message('user').write(prompt)
     add_to_message_history(MessageRole.USER, prompt)
     with st.chat_message(MessageRole.ASSISTANT.value):
+        response_container = st.empty()
         with st.spinner('Thinking...'):
-            response = chat_engine.chat(
+            response_stream = chat_engine.stream_chat(
                 message=prompt,
                 chat_history=st.session_state.messages,
             )
-            st.write(response.response)
-            # st.write(response.sources)
-            add_to_message_history(MessageRole.ASSISTANT, response.response)
+        response: str = ''
+        for token in response_stream.response_gen:
+            response += token
+            response_container.markdown(response)
+        # st.write(response_stream.response)
+        # st.write(response.sources)
+        add_to_message_history(MessageRole.ASSISTANT, response)
