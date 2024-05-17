@@ -35,12 +35,18 @@ if 'messages' not in st.session_state:
         )
     ]
 
+with st.sidebar:
+    model = st.selectbox(
+        label='Select which model to use',
+        options=['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o'],
+    ) or 'gpt-3.5-turbo'
+
 # Dump message history.
 for msg in st.session_state.messages:
     st.chat_message(msg.role.value).write(msg.content)
 
 # Load LLM & embedding models.
-Settings.llm = load_model(api_key=OPENAI_API_KEY)
+Settings.llm = load_model(api_key=OPENAI_API_KEY, model=model)
 Settings.embed_model = load_embed_model(api_key=OPENAI_API_KEY)
 
 # Create chat engine.

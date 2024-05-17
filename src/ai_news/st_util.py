@@ -42,8 +42,10 @@ def load_embed_model(api_key: str) -> OpenAIEmbedding:
 
 
 @st.cache_data
-def load_model(api_key: str) -> OpenAI:
+def load_model(api_key: str, model: str = 'gpt-3.5-turbo') -> OpenAI:
     """Load OpenAI model."""
     return OpenAI(
+        model=model,
         api_key=api_key,
+        max_tokens=2048,
     )
