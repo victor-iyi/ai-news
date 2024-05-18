@@ -11,7 +11,7 @@ def add_to_message_history(role: MessageRole, content: str) -> None:
     """Adds a message to the message history.
 
     Args:
-        role (str): The role of the message sender.
+        role (MessageRole): The role of the message sender.
         content (str): The content of the message.
 
     """
@@ -42,10 +42,14 @@ def load_embed_model(api_key: str) -> OpenAIEmbedding:
 
 
 @st.cache_data
-def load_model(api_key: str, model: str = 'gpt-3.5-turbo') -> OpenAI:
+def load_model(
+    api_key: str,
+    model: str = 'gpt-3.5-turbo',
+    max_tokens: int = 2048,
+) -> OpenAI:
     """Load OpenAI model."""
     return OpenAI(
         model=model,
         api_key=api_key,
-        max_tokens=2048,
+        max_tokens=max_tokens,
     )

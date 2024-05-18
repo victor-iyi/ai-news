@@ -66,6 +66,13 @@ if prompt := st.chat_input('What can I help you with?'):
         for token in response_stream.response_gen:
             response += token
             response_container.markdown(response)
-        # st.write(response_stream.response)
-        # st.write(response.sources)
+
+        # Display response sources.
+        with st.status('Sources', expanded=False, state='complete'):
+            st.json(
+                [
+                    source_node.node.metadata
+                    for source_node in response_stream.source_nodes
+                ]
+            )
         add_to_message_history(MessageRole.ASSISTANT, response)
